@@ -18,7 +18,7 @@ if not st.session_state.get('logged_in', False):
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/signin✅_for_additional.py")  # Redirect back to login page if not logged in
 
 # Your additional page content goes here
-st.title(f"Welcome, {st.session_state.username}!")
+# st.title(f"Welcome, {st.session_state.username}!")
 
 # Function to find information by patient name
 def find_information(patient_name):

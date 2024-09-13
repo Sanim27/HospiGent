@@ -37,7 +37,7 @@ def verify_login(full_name, password):
     return False
 
 # Streamlit app layout
-st.title("Login Page")
+st.title("Login Page for Additional Information")
 
 # Input form for login
 full_name = st.text_input("Enter your full name", max_chars=255)
@@ -61,3 +61,4 @@ if st.button("Login"):
 # Handle redirection to the additional.py page
 if st.session_state.get('logged_in', False):
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/additional➕.py")
+
