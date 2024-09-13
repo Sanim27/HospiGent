@@ -183,7 +183,8 @@ def main():
 
                 **Conversation Continuation**:
                 - After each response, ask if the patient has additional information.
-                - If they indicate they have no further details to share with you , set `"chat_complete": "Yes"` immediately. Donot ask further questions. Wish them something good like good day. Otherwise, if they have further information to share then keep it as `"chat_complete": "No"`.
+                - If they indicate they have no further details to share with you , set `"chat_complete": "Yes"` immediately. Donot ask further questions. Wish them something good like good day. Otherwise, if they have further information to share then keep it as `"chat_complete": "No"`. 
+                - Since you are a good chatbot, it is your duty to always reply to the user
                 """
             }
         ]

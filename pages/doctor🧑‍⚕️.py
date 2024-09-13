@@ -23,6 +23,8 @@ st.title(f"Welcome, {st.session_state.full_name}!")
 
 
 def get_patients(doctors_name, day=today):
+    print("doctor is "+doctors_name)
+    print("today is "+day)
     # Connect to MySQL
     connection = mysql.connector.connect(
         host="localhost",
@@ -30,6 +32,7 @@ def get_patients(doctors_name, day=today):
         user="root",
         password=os.getenv('mysql_password')
     )
+    print("sql connection made")
 
     patients_with_additional_details = []
 
@@ -43,6 +46,7 @@ def get_patients(doctors_name, day=today):
         
         cursor.execute(check_query, (doctors_name, day))
         patients = cursor.fetchall()
+        print(patients)
 
         # Use `with` statement to manage MongoDB connection
         with MongoClient('mongodb://localhost:27017/') as client:
@@ -59,7 +63,7 @@ def get_patients(doctors_name, day=today):
                 }
 
                 # Fetch additional details from MongoDB based on patient's full_name
-                additional_details = collection.find_one({"name": patient[0]})
+                additional_details = collection.find_one({"username": patient[0]})
 
                 if additional_details:
                     # Exclude '_id' field from additional details if it exists
@@ -67,6 +71,8 @@ def get_patients(doctors_name, day=today):
                     patient_data['additional'] = additional_details
 
                 patients_with_additional_details.append(patient_data)
+                print(patients_with_additional_details)
+                
 
         # Close MySQL connection
         cursor.close()
@@ -97,19 +103,46 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 
 def main():
     st.title("Doctor's agent")
-    patients_info  = get_patients('Dr. Bob Johnson', 'Monday')
+    patients_info  = get_patients(st.session_state.full_name,"Tuesday")
+
+    # if "messages" not in st.session_state:
+    #     st.session_state.messages=[
+    #         {"role":"system","content":"""you are an hospital's agent designed to help the doctors about various patients he/she will be examining into today and also 
+    #          provide a detail analysis of what medical issue the patient might have based on your knowledge and given patient's information.
+    #          1. **If doctor asks about who they are examining for the day just give the list of patients with very short detail in dictionary form(without inverted commas ofcourse) example: name:abcd problem:eyes pain appointment_time:2:00pm-3:00pm and other information from patient's data.
+    #          2. **If doctor asks more details about some patient, only then give additional information if it is known to you if the additional detail is not present then just respond that it is not available.
+    #         you must answer whenever doctor asks about something. 
+    #         You will be provided with 
+    #          a list of all the patients the doctor will examine today and the patient's data contain some general information as well as additional information which is taken from their medical report(additional information maynot be present as well).
+    #          if additional information is empty, it means that the patient doesnot have any report . Most important: donot give random patient's information by generating yourself. It will be given you below.
+    #          """},
+    #          {"role": "system", "content": f"Here is the patient's information for the day: {patients_info}"}
+    #     ]
 
     if "messages" not in st.session_state:
-        st.session_state.messages=[
-            {"role":"system","content":"""you are an hospital's agent designed to help the doctors about various patients he will be looking today and also 
-             provide a detail analysis of what medical issue the patient might have based on your knowledge.
-             answer whenever doctor asks about something. 
-              Your will be provided with 
-             a list of all the patients the doctor will visit today and the patient's data contain some general information as well as additional information which is taken from their medical report.
-             if additional information is empty, it means that the patient doesnot have any report .
-             """},
-             {"role": "system", "content": f"Here is the doctor's information: {patients_info}"}
-        ]
+        st.session_state.messages = [
+                {"role": "system", "content": """You are an assistant for a doctor at a hospital. Your job is to help the doctor by providing information about the patients they will examine today. Here’s how you should respond:
+
+        1. **If the doctor asks who they are examining today,** provide a list of patients in this format: 
+        - name: patient_name
+        - problem: patient_problem
+        - appointment_time: time_range
+
+        Example: 
+        name: John Doe, problem: headache, appointment_time: 2:00pm-3:00pm
+
+        Then also ask doctor if the doctor specifically wants any additional details of any patients.
+
+        2. **If the doctor asks for more details about a patient,** provide extra information only if it's available from the patient's data. If no extra details are available, just say that the information is not available.
+
+        3. Do not create or guess any patient information on your own. You will be given the patient's information, and you should only use that.
+
+        4. Since you are a good chatbot, it is your duty to always reply to the user(in this case doctor)
+
+        You will receive a list of patients and their information. Some patients might have additional details from their medical report, but others may not. If no extra information is available, just note that the patient does not have a report."""},
+                {"role": "system", "content": f"Here is the patient's information for the day: {patients_info}"}
+            ]
+
 
      #displaying messages
     for message in st.session_state.messages:
