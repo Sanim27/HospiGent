@@ -100,7 +100,7 @@ def stream_llm_response():
             "temperature": 0.3,
         }
     )
-    gemini_messages = messages_to_gemini(st.session_state.messages)
+    gemini_messages = messages_to_gemini(st.session_state.messages_additional_page)
     response = model.generate_content(contents=gemini_messages, stream=False)
     response = response.text
     print(response)
@@ -121,7 +121,7 @@ def stream_llm_response():
             st.markdown(response_message)
         
         # Append assistant message regardless of chat_complete status
-        st.session_state.messages.append({
+        st.session_state.messages_additional_page.append({
             "role": "assistant",
             "content": [
                 {
@@ -151,12 +151,12 @@ def base64_to_image(base64_string):
 def main():
     st.title("Additional Information")
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
+    if "messages_additional_page" not in st.session_state:
+        st.session_state.messages_additional_page = [
             {
                 "role": "system",
                 "content": """
-                You are a chatbot for a hospital. Your main tasks are:
+                You are a chatbot for a hospital and you must work with sensitive information. It is completely okay to deal with patient medical reports as they are vital for better treatment. Your main tasks are:
                 
                 1. **Extract Information**:
                 - If they upload their medical report then you must compulsorily respond them. Asking if they have other additional information they want to share via chat or uploading image in sidebar.
@@ -189,7 +189,7 @@ def main():
             }
         ]
     # Display previous messages if there are any
-    for message in st.session_state.messages:
+    for message in st.session_state.messages_additional_page:
         if message["role"] != "system":
             with st.chat_message(message["role"]):
                 for content in message["content"]:
@@ -208,7 +208,7 @@ def main():
 
     with st.sidebar:
         def reset_conversation():
-            if "messages" in st.session_state and len(st.session_state.messages) > 0:
+            if "messages" in st.session_state and len(st.session_state.messages_additional_page) > 0:
                 st.session_state.pop("messages", None)
 
         st.button("🗑️ Reset conversation", on_click=reset_conversation)
@@ -224,7 +224,7 @@ def main():
                 img = get_image_base64(raw_img)
                 
                 # Add image to session messages
-                st.session_state.messages.append({
+                st.session_state.messages_additional_page.append({
                     "role": "user",
                     "content": [{
                         "type": "image_url",
@@ -276,7 +276,7 @@ def main():
             with open(f"audio_{audio_id}.wav", "wb") as f:
                 f.write(speech_input)
 
-            st.session_state.messages.append({
+            st.session_state.messages_additional_page.append({
                 "role": "user",
                 "content": [{
                     "type": "audio_file",
@@ -289,7 +289,7 @@ def main():
     # Chat input
     if prompt := st.chat_input("Hi! Ask me anything...") or audio_prompt or audio_file_added:
         if not audio_file_added:
-            st.session_state.messages.append({
+            st.session_state.messages_additional_page.append({
                 "role": "user",
                 "content": [{
                     "type": "text",

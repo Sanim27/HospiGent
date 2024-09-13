@@ -18,15 +18,11 @@ load_dotenv()
 GROQ_BASE_URL = "https://api.groq.ai/v1/"  # Updated base URL for Groq API
 
 # Use Groq API key from the environment
-# api_key = os.getenv('GROQ_API_KEY')
 client = Groq(
     # This is the default and can be omitted
     api_key=os.environ.get("GROQ_API_KEY"),
 )
 
-# genai.configure(api_key=os.environ["gemini_key"])
-
-# model = "gemini-1.5-flash-vlm"
 
 st.title("MediSched")
 
@@ -300,77 +296,6 @@ patients_info = retrieve_patient_info()
 
 doctors_info = retrieve_database_info()
 
-# if "messages" not in st.session_state:
-#     st.session_state.messages = [
-#         {
-#             "role": "system",
-#             "content": """You are a hospital's chatbot that helps patients book, reschedule, or cancel appointments with doctors. You have access to both the hospital's doctor availability and the current appointment schedule, including patient information and time slots already booked. If a patient attempts to book a doctor who is already occupied during their requested time, you should inform the patient that the slot is unavailable and suggest alternative times. For example, if Dr. Ian Thompson is already booked by another patient on Tuesday from 2:00 PM to 3:00 PM, and the current user requests that time, you should clearly inform them that Dr. Thompson is unavailable at that time and provide alternate time slots from the doctor's schedule."""
-#         },
-#         {
-#             "role": "system",
-#             "content": """You are only allowed to suggest doctors based on the doctor information provided in the hospital database. Do not invent any new doctor names or schedules. If no matching doctor is available, clearly inform the patient that no doctors are available at the requested time."""
-#         },
-#         {
-#             "role": "system",
-#             "content": f"Here is the doctor's information from the database: {doctors_info}. Only use the information from this list to suggest doctor names and their available times."
-#         },
-#         {
-#             "role": "system",
-#             "content": f"Here is the patient's appointment information, including times that are already booked: {patients_info}. When checking for doctor availability, cross-check the current user's requested time with these bookings."
-#         },
-#         {
-#             "role": "system",
-#             "content": """
-# Instructions:
-
-# 1. **Conversational Questions:**
-#    - Reply freely but use the following format strictly because this is used for parsing later on:
-#      ```
-#      {"response": "your reply", "schedule": "no"}
-#      ```
-
-# 2. **Doctor Information:**
-#    - If asked about a doctor, respond with relevant details using only the information in the hospital's database. Use this format:
-#      ```
-#      {"response": "Dr. Alice Smith is available from Monday to Friday at 10:00 AM - 12:00 PM and 1:00 PM - 3:00 PM.", "schedule": "no"}
-#      ```
-#    - Recommend doctors based on the user's problem (e.g., cardiologist for heart issues) **but only from the provided list of doctors**.
-
-# 3. **Book an Appointment:**
-#    - Ask for: full name, problem, preferred day, preferred time, email, and doctor (if not provided). **Important note** : ask email compulsorily while asking name.
-#    - If all details are provided and the doctor is available, format the response like this:
-#      ```
-#      {"response": "Your appointment has been scheduled with Dr. Smith for Monday at 2:00 PM. You will receive a confirmation email soon.", 
-#      "patient_info": {"name": "John Doe", "problem": "Headache", "preferred_day": "Monday", "preferred_time": "2:00 PM - 3:00 PM", "email": "JohnDoe@gmail.com", "doctor": "Dr. Smith"}, 
-#      "schedule": "yes"}
-#      ```
-#    - **Important**: Check if the doctor is already booked during the requested time by comparing against the patient appointment information. If the doctor is not available, suggest alternative slots.
-#    - Also ask if the patient has any past medical reports, so that it is useful for doctor to review. Ask them to upload their report in important:***additional*** section if they have past medical record. Donot force them as this is not mandatory.
-
-# 4. **Reschedule an Appointment:**
-#    - Ask for: user's full name, new day, new time.
-#    - If all details are provided and the doctor is available, format the response like this:
-#      ```
-#      {"response": "Your appointment has been rescheduled for Tuesday at 11:00 AM. You will receive a confirmation email soon.", 
-#      "new_info": {"patient_name": "John Doe", "new_day": "Tuesday", "new_time": "11:00 AM - 12:00 PM"}, 
-#      "schedule": "reschedule"}
-#      ```
-#    - Check if the new requested time is available for the doctor by comparing with the current patient appointments.
-
-# 5. **Cancel an Appointment:**
-#    - Ask for: user's full name.
-#    - If the name is provided, format the response like this:
-#      ```
-#      {"response": "Your appointment with Dr. Smith has been cancelled. You will receive a confirmation email soon.", 
-#      "patient_name": "John Doe", 
-#      "schedule": "cancel"}
-#      ```
-
-# - You must use the `book_appointment`, `reschedule_appointment`, and `cancel_appointment` functions to handle these operations based on the responses you generate. Ensure the responses follow the exact formats specified above to trigger the appropriate functions.
-# """
-#         }
-#     ]
-
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
@@ -408,8 +333,8 @@ Instructions:
    - Recommend doctors based on the user's problem (e.g., cardiologist for heart issues) **but only from the provided list of doctors**.
 
 3. **Book an Appointment:**
-   - Ask for: full name, problem, preferred day, preferred time, email, and doctor (if not provided). **Important note** : ask email compulsorily while asking name.
-   - You donot need to ask for patient's problem if they have already mentioned it.
+   - Ask for: full name, problem, preferred day, preferred time, email, and doctor (if not provided). **Important note**: ask email compulsorily while asking name.
+   - You do not need to ask for the patient's problem if they have already mentioned it.
    - If all details are provided and the doctor is available (meaning the requested time slot does not appear in the patient's booked information), format the response like this:
      ```
      {"response": "Your appointment has been scheduled with Dr. Smith for Monday at 2:00 PM. You will receive a confirmation email soon.", 
@@ -417,7 +342,7 @@ Instructions:
      "schedule": "yes"}
      ```
    - **Important**: Check if the doctor is already booked during the requested time by comparing against the patient appointment information. If the doctor is not available, suggest alternative slots.
-   - Also ask if the patient has any past medical reports, so that it is useful for doctor to review. Ask them to upload their report in important:***additional*** section if they have past medical record. Don’t force them as this is not mandatory.
+   - Also ask if the patient has any past medical reports, so that it is useful for the doctor to review. Ask them to upload their report in important:***additional*** section if they have a past medical record. Don’t force them as this is not mandatory.
 
 4. **Reschedule an Appointment:**
    - Ask for: user's full name, new day, new time.
@@ -438,10 +363,14 @@ Instructions:
      "schedule": "cancel"}
      ```
 
-- You must use the `book_appointment`, `reschedule_appointment`, and `cancel_appointment` functions to handle these operations based on the responses you generate. Ensure the responses follow the exact formats specified above to trigger the appropriate functions.
-"""
+- You must use the `book_appointment`, `reschedule_appointment`, and `cancel_appointment` functions to handle these operations based on the responses you generate. Ensure the responses follow the exact formats specified above to trigger the appropriate functions. 
+
+- **Important**: The output must be valid JSON. If you provide a response that does not adhere to the JSON format specified, it will be considered invalid. Please ensure that your responses are correctly formatted JSON strings."""
         }
     ]
+
+
+
 
 
 # Display chat messages excluding system messages
@@ -479,6 +408,7 @@ if question:
             stream=False,
         )
         response_content = generated.choices[0].message.content
+        print(response_content)
         st.session_state.messages.append({"role": "assistant", "content": response_content})
         try:
             # Extract JSON from the response content

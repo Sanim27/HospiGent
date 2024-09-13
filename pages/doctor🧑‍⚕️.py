@@ -19,6 +19,16 @@ if not st.session_state.get('logged_in', False):
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/doc_login.py")  # Redirect to login page
     st.experimental_rerun()  # Rerun the app to show the login page
 
+# if "messages" not in st.session_state or not st.session_state.messages:
+#     st.session_state.messages = [
+#         {
+#             "role": "system",
+#             "content": """
+#             You are a chatbot for a hospital. Your main tasks are...
+#             """
+#         }
+#     ]
+
 st.title(f"Welcome, {st.session_state.full_name}!")
 
 

@@ -18,6 +18,16 @@ if not st.session_state.get('logged_in', False):
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/admin_login.py")  # Redirect to login page
     st.experimental_rerun() 
 
+# if "messages" not in st.session_state or not st.session_state.messages:
+#     st.session_state.messages = [
+#         {
+#             "role": "system",
+#             "content": """
+#             You are a chatbot for a hospital. Your main tasks are...
+#             """
+#         }
+#     ]
+
 def send_emails(patient_email, text_to_send):
     try:
         # Email server setup
