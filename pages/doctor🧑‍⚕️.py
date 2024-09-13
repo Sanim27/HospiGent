@@ -103,21 +103,7 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 
 def main():
     st.title("Doctor's agent")
-    patients_info  = get_patients(st.session_state.full_name,"Tuesday")
-
-    # if "messages" not in st.session_state:
-    #     st.session_state.messages=[
-    #         {"role":"system","content":"""you are an hospital's agent designed to help the doctors about various patients he/she will be examining into today and also 
-    #          provide a detail analysis of what medical issue the patient might have based on your knowledge and given patient's information.
-    #          1. **If doctor asks about who they are examining for the day just give the list of patients with very short detail in dictionary form(without inverted commas ofcourse) example: name:abcd problem:eyes pain appointment_time:2:00pm-3:00pm and other information from patient's data.
-    #          2. **If doctor asks more details about some patient, only then give additional information if it is known to you if the additional detail is not present then just respond that it is not available.
-    #         you must answer whenever doctor asks about something. 
-    #         You will be provided with 
-    #          a list of all the patients the doctor will examine today and the patient's data contain some general information as well as additional information which is taken from their medical report(additional information maynot be present as well).
-    #          if additional information is empty, it means that the patient doesnot have any report . Most important: donot give random patient's information by generating yourself. It will be given you below.
-    #          """},
-    #          {"role": "system", "content": f"Here is the patient's information for the day: {patients_info}"}
-    #     ]
+    patients_info  = get_patients(st.session_state.full_name,"Monday")
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
