@@ -49,7 +49,7 @@ if st.button("Login"):
         st.success("Login successful! Redirecting to the next page...")
         
         # Set session state for redirection
-        st.session_state.logged_in = True
+        st.session_state.pat_logged_in = True
         st.session_state.username = full_name
         st.session_state.password = password
         
@@ -59,6 +59,6 @@ if st.button("Login"):
         st.error("Login failed. Please check your name or password.")
 
 # Handle redirection to the additional.py page
-if st.session_state.get('logged_in', False):
+if st.session_state.get('pat_logged_in', False):
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/additional➕.py")
 

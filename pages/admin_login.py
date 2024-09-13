@@ -42,7 +42,7 @@ admin_name = st.text_input("Enter your full name")
 # Button to log in
 if st.button("Login as Admin"):
     if verify_admin_login(admin_id, admin_name):
-        st.session_state.logged_in = True
+        st.session_state.admin_logged_in = True
         st.session_state.admin_id = admin_id
         st.session_state.admin_name = admin_name
         st.success("Login successful!")

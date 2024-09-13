@@ -13,7 +13,7 @@ from pymongo import MongoClient
 
 dotenv.load_dotenv()
 # Check if user is logged in
-if not st.session_state.get('logged_in', False):
+if not st.session_state.get('pat_logged_in', False):
     st.text("PLEASE GO TO SIGNIN PAGE FIRST")
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/signin✅_for_additional.py")  # Redirect back to login page if not logged in
 

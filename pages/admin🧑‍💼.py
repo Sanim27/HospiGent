@@ -13,7 +13,7 @@ dotenv.load_dotenv()
 
 client = Groq()
 
-if not st.session_state.get('logged_in', False):
+if not st.session_state.get('admin_logged_in', False):
     st.warning("You must log in first to access the Admin page.")
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/admin_login.py")  # Redirect to login page
     st.experimental_rerun() 

@@ -14,7 +14,7 @@ todate = date.today()
 today = todate.strftime("%A")
 
 # Check if the user is logged in
-if not st.session_state.get('logged_in', False):
+if not st.session_state.get('doc_logged_in', False):
     st.warning("You must log in first to access the Doctor's page.")
     st.switch_page("/Users/sanimpandey/Desktop/lang/pages/doc_login.py")  # Redirect to login page
     st.experimental_rerun()  # Rerun the app to show the login page

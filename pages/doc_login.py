@@ -42,7 +42,7 @@ full_name = st.text_input("Enter your full name")
 # Button to log in
 if st.button("Login"):
     if verify_login(doctor_id, full_name):
-        st.session_state.logged_in = True
+        st.session_state.doc_logged_in = True
         st.session_state.doctor_id = doctor_id
         st.session_state.full_name = full_name
         st.success("Login successful!")
