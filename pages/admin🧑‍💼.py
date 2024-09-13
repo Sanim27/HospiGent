@@ -13,6 +13,11 @@ dotenv.load_dotenv()
 
 client = Groq()
 
+if not st.session_state.get('logged_in', False):
+    st.warning("You must log in first to access the Admin page.")
+    st.switch_page("/Users/sanimpandey/Desktop/lang/pages/admin_login.py")  # Redirect to login page
+    st.experimental_rerun() 
+
 def send_emails(patient_email, text_to_send):
     try:
         # Email server setup
@@ -222,7 +227,8 @@ def get_info_client(query):
         display_in_chunks_with_cursor("some error realted to query occured.")
 
 def main():
-    st.title("Admin Assist")
+    # st.title("Admin Panel")
+    st.title(f"Welcome, {st.session_state.admin_name}!")
 
     client = Groq()
 
