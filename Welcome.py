@@ -71,7 +71,7 @@ with col1:
     # Create a select box for navigation
     option = st.selectbox(
         "Choose your role",
-        ("Select...", "Patient_Appointment", "Doctor", "Admin", "Additional_Info_SignIn")
+        ("Select...", "Patient_Appointment", "Doctor", "Admin", "Patient_Additional_info")
     )
 
     # Logic to redirect users based on role selection
@@ -83,8 +83,8 @@ with col1:
             st.switch_page(page="pages/doctor🧑‍⚕️.py")
         elif option == "Admin":
             st.switch_page(page="pages/admin🧑‍💼.py")
-        elif option == "Additional_Info_SignIn":
-            st.switch_page(page="pages/signin✅_for_additional.py")
+        elif option == "Patient_Additional_info":
+            st.switch_page(page="pages/additional➕.py")
         st.experimental_rerun()
 
 with col2:

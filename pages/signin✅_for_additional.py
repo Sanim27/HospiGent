@@ -38,6 +38,7 @@ def verify_login(full_name, password):
 
 # Streamlit app layout
 st.title("Login Page for Additional Information")
+st.write("Use your full name and password provided in mail to login.")
 
 # Input form for login
 full_name = st.text_input("Enter your full name", max_chars=255)
