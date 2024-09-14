@@ -48,7 +48,7 @@ if st.button("Login"):
         st.success("Login successful!")
         
         # Redirect to the doctor page
-        st.switch_page("/Users/sanimpandey/Desktop/lang/pages/doctor🧑‍⚕️.py")
+        st.switch_page("pages/doctor🧑‍⚕️.py")
         st.experimental_rerun()
     else:
         st.error("Login failed. Please check your Doctor ID or Full Name.")

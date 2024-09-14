@@ -15,10 +15,10 @@ dotenv.load_dotenv()
 # Check if user is logged in
 if not st.session_state.get('pat_logged_in', False):
     st.text("PLEASE GO TO SIGNIN PAGE FIRST")
-    st.switch_page("/Users/sanimpandey/Desktop/lang/pages/signin✅_for_additional.py")  # Redirect back to login page if not logged in
+    st.switch_page("pages/signin✅_for_additional.py")  # Redirect back to login page if not logged in
 
 # Your additional page content goes here
-# st.title(f"Welcome, {st.session_state.username}!")
+st.title(f"Welcome, {st.session_state.username}!")
 
 # Function to find information by patient name
 def find_information(patient_name):
@@ -103,7 +103,6 @@ def stream_llm_response():
     gemini_messages = messages_to_gemini(st.session_state.messages_additional_page)
     response = model.generate_content(contents=gemini_messages, stream=False)
     response = response.text
-    print(response)
     
     # Attempt to extract JSON-like part of the response
     json_match = re.search(r'\{.*\}', response, re.DOTALL)
@@ -114,9 +113,8 @@ def stream_llm_response():
         # Check if the conversation is complete
         chat_complete = response_dict.get('chat_complete', '').lower()  # Lowercase comparison
         if chat_complete == 'yes':
-            print("Chat completed, triggering information_store") # For debugging
+            st.markdown(response_message)
             information_store(response_dict['information_to_store'], st.session_state.username, st.session_state.password)
-            print("Information stored as chat_complete is 'yes'")
         else:
             st.markdown(response_message)
         
@@ -131,7 +129,7 @@ def stream_llm_response():
             ]
         })
     else:
-        st.markdown("No valid response received from the model.")
+        st.markdown(response)
 
 
 
@@ -149,7 +147,6 @@ def base64_to_image(base64_string):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Additional Information")
 
     if "messages_additional_page" not in st.session_state:
         st.session_state.messages_additional_page = [
@@ -184,7 +181,7 @@ def main():
                 **Conversation Continuation**:
                 - After each response, ask if the patient has additional information.
                 - If they indicate they have no further details to share with you , set `"chat_complete": "Yes"` immediately. Donot ask further questions. Wish them something good like good day. Otherwise, if they have further information to share then keep it as `"chat_complete": "No"`. 
-                - Since you are a good chatbot, it is your duty to always reply to the user
+                - Since you are a good chatbot, it is your duty to always reply to the user even at the end of conversation.
                 """
             }
         ]

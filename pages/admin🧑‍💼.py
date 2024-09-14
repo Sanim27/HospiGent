@@ -15,18 +15,10 @@ client = Groq()
 
 if not st.session_state.get('admin_logged_in', False):
     st.warning("You must log in first to access the Admin page.")
-    st.switch_page("/Users/sanimpandey/Desktop/lang/pages/admin_login.py")  # Redirect to login page
+    st.switch_page("pages/admin_login.py")  # Redirect to login page
     st.experimental_rerun() 
 
-# if "messages" not in st.session_state or not st.session_state.messages:
-#     st.session_state.messages = [
-#         {
-#             "role": "system",
-#             "content": """
-#             You are a chatbot for a hospital. Your main tasks are...
-#             """
-#         }
-#     ]
+st.title(f"Welcome, {st.session_state.admin_name}!")
 
 def send_emails(patient_email, text_to_send):
     try:
@@ -40,7 +32,7 @@ def send_emails(patient_email, text_to_send):
         server.login(sender_email, sender_password)
 
         # Compose the email
-        subject = "test report"
+        subject = "message from staff"
         body = f"{text_to_send}"
 
         msg = MIMEMultipart()
@@ -65,15 +57,11 @@ def doctor_unavailable(doctor_name,message):
 # Helper function to get the next day of the week
     def get_next_day(current_day):
         days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        
-        # Find the index of the current day
         current_index = days_of_week.index(current_day)
         
-        # Calculate the next day
         next_index = (current_index + 1) % 7
         
         return days_of_week[next_index]
-    # Connect to MySQL
     connection = mysql.connector.connect(
         host="localhost",
         database='hospital',
@@ -94,7 +82,7 @@ def doctor_unavailable(doctor_name,message):
         # Check if there are any patients to update
         if not patients:
             display_in_chunks_with_cursor(f"{doctor_name} has no any appointments today so the unavailability won't matter much.")
-            st.session_state.messages.append({"role":"assistant","content":f"{doctor_name} has no any appointments today so the unavailability won't matter much."})
+            st.session_state.messages_admin.append({"role":"assistant","content":f"{doctor_name} has no any appointments today so the unavailability won't matter much."})
             cursor.close()
             connection.close()
             return
@@ -115,8 +103,10 @@ def doctor_unavailable(doctor_name,message):
 
         connection.commit()
 
-        st.session_state.messages.append({"role":"assistant","content":"I have successfully updated the database and conveyed this information to patients."})
-        display_in_chunks_with_cursor("I have successfully updated the database and conveyed this information to patients.")
+        
+
+        st.session_state.messages.append({"role":"assistant","content":f"{doctor_name}'s all appointments have been scheduled for {next_day} and all the patients of {doctor_name} have been notified through email as well."})
+        display_in_chunks_with_cursor(f"{doctor_name}'s all appointments have been scheduled for {next_day} and all the patients of {doctor_name} have been notified through email as well.")
 
         # Close the connection
         cursor.close()
@@ -142,10 +132,9 @@ def send_message_to_patient(patients_dict, message):
         else:
             # Extract the list of patient names from the dictionary
             patient_names = patients_dict.get('patients', [])
-            st.markdown(patient_names)
             if not patient_names:
                 display_in_chunks_with_cursor("you didn't provided patients name")
-                st.session_state.messages.append({"role":"assistant","content":"you didn't provided patients name"})
+                st.session_state.messages_admin.append({"role":"assistant","content":"you didn't provided patients name"})
                 cursor.close()
                 connection.close()
                 return
@@ -159,8 +148,8 @@ def send_message_to_patient(patients_dict, message):
 
         # If no patients were found, return
         if not result:
-            display_in_chunks_with_cursor("no any patients of such names. please recheck and provide correct names of the patients.")
-            st.session_state.messages.append({"role":"assistant","content":"no any patients of such names. please recheck and provide correct names of the patients."})
+            display_in_chunks_with_cursor("we have No any patients of such names.Can you please recheck and provide correct names of the patients.")
+            st.session_state.messages_admin.append({"role":"assistant","content":"we have No any patients of such names.Can you please recheck and provide correct names of the patients."})
             cursor.close()
             connection.close()
             return
@@ -170,7 +159,7 @@ def send_message_to_patient(patients_dict, message):
             full_name, email = patient
             send_emails(email,message)
 
-        st.session_state.messages.append({"role":"assistant","content":"Your task has been executed successfully. All the patients are notified."})
+        st.session_state.messages_admin.append({"role":"assistant","content":"Your task has been executed successfully. All the patients are notified."})
         display_in_chunks_with_cursor("Your task has been executed successfully. All the patients are notified.")
         # Close the cursor and connection
         cursor.close()
@@ -232,18 +221,17 @@ def get_info_client(query):
         # Get the response from the LLM
         response_content = generated.choices[0].message.content
         display_in_chunks_with_cursor(response_content)
-        st.session_state.messages.append({"role":"assistant","content":response_content})        
+        st.session_state.messages_admin.append({"role":"assistant","content":response_content})        
     else:
         display_in_chunks_with_cursor("some error realted to query occured.")
+        st.session_state.messages_admin.append({"role":"assistant","content":"some error realted to query occured."})
 
 def main():
-    # st.title("Admin Panel")
-    st.title(f"Welcome, {st.session_state.admin_name}!")
 
     client = Groq()
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
+    if "messages_admin" not in st.session_state:
+        st.session_state.messages_admin = [
             {"role":"system","content":"""You are an assistant for hospital administrative staff. You need to make a conversation with the admin staff and perform certain tasks for him/her.
              you have multiple tools to assist you with.
              
@@ -279,7 +267,7 @@ def main():
              """}
         ]
 
-    for message in st.session_state.messages:
+    for message in st.session_state.messages_admin:
         if message["role"] != "system":
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
@@ -289,25 +277,24 @@ def main():
         with st.chat_message("user"):
             st.markdown(question)
 
-        st.session_state.messages.append({"role": "user", "content": question})
+        st.session_state.messages_admin.append({"role": "user", "content": question})
 
         with st.chat_message("assistant"):
             # Generate a response from the assistant
             generated = client.chat.completions.create(
                 model="llama-3.1-70b-versatile",
                 messages=[
-                    {"role": m["role"], "content": m["content"]} for m in st.session_state.messages
+                    {"role": m["role"], "content": m["content"]} for m in st.session_state.messages_admin
                 ],
                 stream=False,
             )
             response_content = generated.choices[0].message.content
-            st.markdown(response_content)
             json_match = re.search(r'\{.*\}', response_content, re.DOTALL)
             if json_match:
                 response_dict = json.loads(json_match.group())
                 if response_dict['tool']=='no':
                     display_in_chunks_with_cursor(response_dict['response'])
-                    st.session_state.messages.append({"role":"assistant","content":response_dict['response']})
+                    st.session_state.messages_admin.append({"role":"assistant","content":response_dict['response']})
                 elif response_dict['tool']=='doctor_not_available':
                     doctor_unavailable(response_dict['doctor_name'],response_dict['message'])
                 elif response_dict['tool']=='send_message_to_patient':
@@ -315,7 +302,7 @@ def main():
                 elif response_dict['tool']=='get_info':
                     get_info_client(response_dict['query'])
             else:
-                st.markdown("no json response")
+                display_in_chunks_with_cursor(response_content)
 
 
 if __name__=="__main__":
