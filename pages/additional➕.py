@@ -10,6 +10,7 @@ from io import BytesIO
 import google.generativeai as genai
 import random
 from pymongo import MongoClient
+import time
 
 dotenv.load_dotenv()
 # Check if user is logged in
@@ -27,6 +28,26 @@ def find_information(patient_name):
     collection = db['Patients']
     patient_info = collection.find_one({"name": patient_name})
     print(patient_info)
+
+def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
+    message_placeholder = st.empty()
+    
+    # Initialize an empty string to accumulate the text
+    accumulated_text = ""
+    
+    # Iterate over the text in chunks
+    for i in range(0, len(response), chunk_size):
+        # Get the current chunk
+        chunk = response[i:i+chunk_size]
+        # Append the chunk to the accumulated text
+        accumulated_text += chunk
+        # Update the placeholder with the accumulated text and the cursor "▌"
+        message_placeholder.markdown(accumulated_text + "▌", unsafe_allow_html=True)
+        # Wait for 'delay' seconds before displaying the next chunk
+        time.sleep(delay)
+    
+    # After all chunks are displayed, remove the cursor
+    message_placeholder.markdown(accumulated_text, unsafe_allow_html=True)
 
 # Function to store patient information in MongoDB
 def information_store(patient_info, user, pw):
@@ -113,10 +134,12 @@ def stream_llm_response():
         # Check if the conversation is complete
         chat_complete = response_dict.get('chat_complete', '').lower()  # Lowercase comparison
         if chat_complete == 'yes':
-            st.markdown(response_message)
+            # st.markdown(response_message)
+            display_in_chunks_with_cursor(response_message)
             information_store(response_dict['information_to_store'], st.session_state.username, st.session_state.password)
         else:
-            st.markdown(response_message)
+            # st.markdown(response_message)
+            display_in_chunks_with_cursor(response_message)
         
         # Append assistant message regardless of chat_complete status
         st.session_state.messages_additional_page.append({

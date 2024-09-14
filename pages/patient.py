@@ -284,6 +284,8 @@ Instructions:
        
          """}
     ]
+
+    
 # Display chat messages excluding system messages
 for message in st.session_state.messages:
     if message["role"] != "system":

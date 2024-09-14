@@ -23,8 +23,6 @@ st.title(f"Welcome, {st.session_state.full_name}!")
 
 
 def get_patients(doctors_name, day=today):
-    print("doctor is "+doctors_name)
-    print("today is "+day)
     # Connect to MySQL
     connection = mysql.connector.connect(
         host="localhost",
@@ -32,7 +30,6 @@ def get_patients(doctors_name, day=today):
         user="root",
         password=os.getenv('mysql_password')
     )
-    print("sql connection made")
 
     patients_with_additional_details = []
 
@@ -102,7 +99,7 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 
 
 def main():
-    patients_info  = get_patients(st.session_state.full_name,"Monday")
+    patients_info  = get_patients(st.session_state.full_name,today)
 
     if "messages_doc" not in st.session_state:
         st.session_state.messages_doc = [
