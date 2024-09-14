@@ -262,7 +262,7 @@ Instructions:
        assistant:  "Your appointment has been scheduled with Dr. Ian Thompson for Monday at 10:00 AM - 11:00 AM. You will receive a confirmation email soon. Please arrive at least 15 minutes prior to your scheduled appointment time. One of our staff members will assist you with the check-in process."
 
        user: "ok".
-         here, user means to say that he understood his appointment has been scheduled. so , reply in conversational format as in 1.
+         here, user means to say that he understood his appointment has been scheduled. so , reply in conversational format like in 1.
 
 4. **Reschedule an Appointment:**
    - Ask for: user's full name and password that was provided during appointment booking , new day, new time.
@@ -280,7 +280,7 @@ Instructions:
      {"response": "Your appointment has been cancelled. You will receive a confirmation email soon.", "patient_name": "John Doe", "password":"xysxlsos",   
      "schedule": "cancel"}
      ```
- -Note that, there are book_appointment,reschedule_appointment and cancel_appointment functions defined to do the appointment,rescheduling and cancellation job. you just need to respond in the corresponding format as shown above to trigger these functions.
+ -Note that, there are book_appointment,reschedule_appointment and cancel_appointment functions defined to do the appointment,rescheduling and cancellation job. you just need to respond in the corresponding format as shown above to trigger these functions.This is a secret between you and me, you shouldnot let users know about these details about triggering of functions.
        
          """}
     ]

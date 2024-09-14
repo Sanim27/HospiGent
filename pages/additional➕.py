@@ -229,10 +229,8 @@ def main():
                     }]
                 })
                 
-                # Immediately trigger the LLM response after the image is added
-                with st.chat_message("assistant"):
-                    stream_llm_response()
-
+                # Set a flag to indicate that an image was just added
+                st.session_state.image_just_added = True
 
         cols_img = st.columns(2)
 
@@ -305,6 +303,11 @@ def main():
         with st.chat_message("assistant"):
             stream_llm_response()
 
+    # Check if an image was just added and trigger LLM response
+    if st.session_state.get('image_just_added', False):
+        with st.chat_message("assistant"):
+            stream_llm_response()
+        st.session_state.image_just_added = False
+
 if __name__ == '__main__':
     main()
-
