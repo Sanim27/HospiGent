@@ -105,7 +105,7 @@ def doctor_unavailable(doctor_name,message):
 
         
 
-        st.session_state.messages.append({"role":"assistant","content":f"{doctor_name}'s all appointments have been scheduled for {next_day} and all the patients of {doctor_name} have been notified through email as well."})
+        st.session_state.messages_admin.append({"role":"assistant","content":f"{doctor_name}'s all appointments have been scheduled for {next_day} and all the patients of {doctor_name} have been notified through email as well."})
         display_in_chunks_with_cursor(f"{doctor_name}'s all appointments have been scheduled for {next_day} and all the patients of {doctor_name} have been notified through email as well.")
 
         # Close the connection
