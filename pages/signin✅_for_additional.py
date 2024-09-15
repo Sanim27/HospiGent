@@ -23,8 +23,8 @@ def verify_login(full_name, password):
     cursor = connection.cursor()
     
     # Query to check if the user exists and if the password matches
-    query = "SELECT password FROM patients WHERE full_name = %s"
-    cursor.execute(query, (full_name,))  # Exact match on full name
+    query = "SELECT password FROM patients WHERE full_name = %s and password = %s"
+    cursor.execute(query, (full_name,password))  # Exact match on full name
     
     result = cursor.fetchone()
     print(result)
@@ -38,11 +38,11 @@ def verify_login(full_name, password):
 
 # Streamlit app layout
 st.title("Login Page for Additional Information")
-st.write("Use your full name and password provided in mail to login.")
+st.write("Use your full name and patient-id provided in mail to login.")
 
 # Input form for login
 full_name = st.text_input("Enter your full name", max_chars=255)
-password = st.text_input("Enter your password", type="password", max_chars=50)
+password = st.text_input("Enter your patient-id", type="password", max_chars=50)
 
 # Button to log in
 if st.button("Login"):

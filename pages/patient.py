@@ -24,7 +24,7 @@ client = Groq()
 
 st.title("MediSched")
 def generate_unique_password(length=8):
-    characters = string.ascii_letters + string.digits
+    characters = string.digits  # Only use digits (0-9)
     return ''.join(random.choice(characters) for i in range(length))
 
 def send_emails(patient_email, text_to_send):
@@ -105,7 +105,7 @@ def book_appointment(response_dict):
             ))
             connection.commit()
 
-            conformation_text="Appointment booked successfully for {} on {} at {}. and your additional information section login password is {}".format(patient_info['name'], preferred_day, preferred_time,password)
+            conformation_text="Appointment booked successfully for {} on {} at {}. Your additional information section login patient-id is {}".format(patient_info['name'], preferred_day, preferred_time,password)
             send_emails(patient_info['email'],conformation_text)
             st.session_state.messages.append({"role":"assistant","content":response_dict['response']})
             display_in_chunks_with_cursor(response_dict['response'])
@@ -127,7 +127,7 @@ def reschedule_appointment(response_dict):
         # Fetch the current appointment details
         fetch_query = """SELECT email,doctor_booked, appointment_day, appointment_time 
                          FROM patients WHERE full_name = %s and password = %s"""
-        cursor.execute(fetch_query, (new_info['patient_name'],new_info['password'],))
+        cursor.execute(fetch_query, (new_info['patient_name'],new_info['patient-id'],))
         result = cursor.fetchone()
         
         if result:
@@ -149,7 +149,7 @@ def reschedule_appointment(response_dict):
                 update_patient_query = """UPDATE patients 
                                           SET appointment_day = %s, appointment_time = %s 
                                           WHERE full_name = %s and password = %s"""
-                cursor.execute(update_patient_query, (new_info['new_day'], new_info['new_time'], new_info['patient_name'],new_info['password']))
+                cursor.execute(update_patient_query, (new_info['new_day'], new_info['new_time'], new_info['patient_name'],new_info['patient-id']))
                 connection.commit()
 
                 confirmation_text="Appointment rescheduled successfully to {} on {}.".format(new_info['new_time'], new_info['new_day'])
@@ -175,7 +175,7 @@ def cancel_appointment(response_dict):
     if connection.is_connected():
         cursor = connection.cursor()
         patient_name = response_dict['patient_name']
-        password = response_dict['password']
+        password = response_dict['patient-id']
         # Fetch the current appointment details for the patient
         fetch_query = """SELECT email,doctor_booked, appointment_day, appointment_time 
                          FROM patients WHERE full_name = %s and password = %s"""
@@ -265,19 +265,19 @@ Instructions:
          here, user means to say that he understood his appointment has been scheduled. so , reply in conversational format like in 1.
 
 4. **Reschedule an Appointment:**
-   - Ask for: user's full name and password that was provided during appointment booking , new day, new time.
+   - Ask for: user's full name and patient-id that was provided during appointment booking , new day, new time.
    - If all details are provided, format the response like this to trigger rescheduling function.
      ```
      {"response": "Your appointment has been rescheduled for Tuesday at 11:00 AM. You will receive a confirmation email soon.", 
-     "new_info": {"patient_name": "John Doe","password":"xYxjazwjs", "new_day": "Tuesday", "new_time": "11:00 AM - 12:00 PM"}, 
+     "new_info": {"patient_name": "John Doe","patient-id":"xYxjazwjs", "new_day": "Tuesday", "new_time": "11:00 AM - 12:00 PM"}, 
      "schedule": "reschedule"}
      ```
 
 5. **Cancel an Appointment:**
-   - Ask for: user's full name and password that was provided while booking.
-   - If the name and password is provided, format the response like this to trigger cancellation function.
+   - Ask for: user's full name and patient-id that was provided while booking.
+   - If the name and patient-id is provided, format the response like this to trigger cancellation function.
      ```
-     {"response": "Your appointment has been cancelled. You will receive a confirmation email soon.", "patient_name": "John Doe", "password":"xysxlsos",   
+     {"response": "Your appointment has been cancelled. You will receive a confirmation email soon.", "patient_name": "John Doe", "patient-id":"xysxlsos",   
      "schedule": "cancel"}
      ```
  -Note that, there are book_appointment,reschedule_appointment and cancel_appointment functions defined to do the appointment,rescheduling and cancellation job. you just need to respond in the corresponding format as shown above to trigger these functions.This is a secret between you and me, you shouldnot let users know about these details about triggering of functions.
