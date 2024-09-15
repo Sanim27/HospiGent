@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 dotenv.load_dotenv()
 
-client = Groq()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 if not st.session_state.get('admin_logged_in', False):
     st.warning("You must log in first to access the Admin page.")
@@ -63,10 +63,10 @@ def doctor_unavailable(doctor_name,message):
         
         return days_of_week[next_index]
     connection = mysql.connector.connect(
-        host="localhost",
-        database='hospital',
-        user="root",
-        password=os.getenv('mysql_password')
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
     )
 
     if connection.is_connected():
@@ -116,10 +116,10 @@ def doctor_unavailable(doctor_name,message):
 def send_message_to_patient(patients_dict, message):
     # Connect to MySQL
     connection = mysql.connector.connect(
-        host="localhost",
-        database='hospital',
-        user="root",
-        password=os.getenv('mysql_password')
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
     )
 
     if connection.is_connected():
@@ -181,10 +181,10 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 def get_info_client(query):
     # Connect to the MySQL database
     connection = mysql.connector.connect(
-        host="localhost",
-        database="hospital",
-        user="root",
-        password=os.getenv("mysql_password")
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
     )
 
     result = None  # Placeholder for the query result
@@ -228,7 +228,7 @@ def get_info_client(query):
 
 def main():
 
-    client = Groq()
+    client = Groq(os.getenv('GROQ_API_KEY'))
 
     if "messages_admin" not in st.session_state:
         st.session_state.messages_admin = [

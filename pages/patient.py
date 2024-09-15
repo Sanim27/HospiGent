@@ -20,7 +20,7 @@ import textwrap
 load_dotenv()
 
 # client = openai.OpenAI(api_key=api_key, base_url=AI71_BASE_URL)
-client = Groq()
+client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
 st.title("MediSched")
 def generate_unique_password(length=8):
@@ -63,11 +63,11 @@ def send_emails(patient_email, text_to_send):
 #Book appointment function
 def book_appointment(response_dict):
     connection = mysql.connector.connect(
-    host="localhost",
-    database='hospital',
-    user="root",
-    password=os.getenv('mysql_password')
-)
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
+    )
     
     if connection.is_connected():
         cursor = connection.cursor()
@@ -115,11 +115,11 @@ def book_appointment(response_dict):
 
 def reschedule_appointment(response_dict):
     connection = mysql.connector.connect(
-    host="localhost",
-    database='hospital',
-    user="root",
-    password=os.getenv('mysql_password')
-)
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
+    )
     
     if connection.is_connected():
         cursor = connection.cursor()
@@ -166,12 +166,11 @@ def reschedule_appointment(response_dict):
           
 def cancel_appointment(response_dict):
     connection = mysql.connector.connect(
-    host="localhost",
-    database='hospital',
-    user="root",
-    password=os.getenv('mysql_password')
-)
-
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
+    )
     if connection.is_connected():
         cursor = connection.cursor()
         patient_name = response_dict['patient_name']
@@ -206,11 +205,11 @@ def cancel_appointment(response_dict):
 # Function to retrieve doctors' information from the database
 def retrieve_database_info():
     connection = mysql.connector.connect(
-    host="localhost",
-    database='hospital',
-    user="root",
-    password=os.getenv('mysql_password')
-)
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
+    )
     if connection.is_connected():
         doctor_list = []
         if connection.is_connected():

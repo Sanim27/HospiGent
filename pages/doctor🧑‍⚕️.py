@@ -9,7 +9,7 @@ import os
 from pymongo import MongoClient
 dotenv.load_dotenv()
 
-client = Groq()
+client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 todate = date.today()
 today = todate.strftime("%A")
 
@@ -25,10 +25,10 @@ st.title(f"Welcome, {st.session_state.full_name}!")
 def get_patients(doctors_name, day=today):
     # Connect to MySQL
     connection = mysql.connector.connect(
-        host="localhost",
-        database='hospital',
-        user="root",
-        password=os.getenv('mysql_password')
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
     )
 
     patients_with_additional_details = []

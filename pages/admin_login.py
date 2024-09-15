@@ -9,10 +9,10 @@ load_dotenv()
 # MySQL connection setup
 def get_db_connection():
     connection = mysql.connector.connect(
-        host="localhost",
-        database="hospital",
-        user="root",
-        password=os.getenv('mysql_password')
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
     )
     return connection
 
