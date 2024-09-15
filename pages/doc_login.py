@@ -9,10 +9,10 @@ load_dotenv()
 # MySQL connection setup
 def get_db_connection():
     connection = mysql.connector.connect(
-        host="localhost",
-        database="hospital",
-        user="root",
-        password=os.getenv('mysql_password')
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
     )
     return connection
 
@@ -48,7 +48,7 @@ if st.button("Login"):
         st.success("Login successful!")
         
         # Redirect to the doctor page
-        st.switch_page("/Users/sanimpandey/Desktop/lang/pages/doctor🧑‍⚕️.py")
+        st.switch_page("pages/doctor🧑‍⚕️.py")
         st.experimental_rerun()
     else:
         st.error("Login failed. Please check your Doctor ID or Full Name.")
