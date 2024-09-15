@@ -60,5 +60,5 @@ if st.button("Login"):
 
 # Handle redirection to the additional.py page
 if st.session_state.get('logged_in', False):
-    st.switch_page("/Users/sanimpandey/Desktop/lang/pages/additional➕.py")
+    st.switch_page("pages/additional➕.py")
 
