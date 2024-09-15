@@ -4,7 +4,6 @@ This project serves as an integrated platform for managing hospital activities, 
 
 ## How to Run Locally
 
-### Step 1: Clone the Project
 ```bash
 git clone <repository-url>
 cd <repository-directory>
