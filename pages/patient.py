@@ -250,7 +250,7 @@ Instructions:
    - Recommend doctors based on the user's problem (e.g., cardiologist for heart issues).
 
 3. **Book an Appointment:**
-   - Ask for: full name, problem, preferred day, preferred time, email, and doctor if not provided.
+   - Ask for: full name, problem, preferred day, preferred time, email, and doctor if not provided. if the patient doesnot provide you email , then ask for the email again as it is very important to notify the patients.
    - If all details are provided(if not ask for the detail again), format the response like this to trigger booking function:
      ```
      {"response": "Your appointment has been scheduled with Dr. Smith for Monday at 2:00 PM - 3:00 PM (or 10:00 AM - 11:00 PM). You will receive a confirmation email soon.(add some greetings and something about arival time )", 
