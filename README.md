@@ -20,4 +20,10 @@ net start MongoDB
 cd C:\Program Files\MongoDB\Server\{version}\bin
 mongod --dbpath "C:\data\db"
 
+## .env file format:
+mysql_password="local_sql_password"
+GROQ_API_KEY="Groq api key"
+email="your email to send mails to patients"
+password="16 character long password from google app passwords"
+GOOGLE_API_KEY="Gemini api key"
 
