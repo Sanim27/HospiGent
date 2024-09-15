@@ -51,7 +51,6 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 
 # Function to store patient information in MongoDB
 def information_store(patient_info, user, pw):
-    print("information store called")
     client = MongoClient('mongodb://localhost:27017/')
     db = client['Hospital']
     collection = db['Patients']
