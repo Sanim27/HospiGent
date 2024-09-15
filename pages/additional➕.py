@@ -22,7 +22,7 @@ if not st.session_state.get('logged_in', False):
 
 # Function to find information by patient name
 def find_information(patient_name):
-    client = MongoClient('mongodb://localhost:27017/')
+    client = MongoClient(os.getenv('mongo_client'))
     db = client['Hospital']
     collection = db['Patients']
     patient_info = collection.find_one({"name": patient_name})
@@ -30,8 +30,7 @@ def find_information(patient_name):
 
 # Function to store patient information in MongoDB
 def information_store(patient_info, user, pw):
-    print("information store called")
-    client = MongoClient('mongodb://localhost:27017/')
+    client = MongoClient(os.getenv('mongo_client'))
     db = client['Hospital']
     collection = db['Patients']
 

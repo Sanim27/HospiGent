@@ -14,25 +14,22 @@ todate = date.today()
 today = todate.strftime("%A")
 
 # Check if the user is logged in
-if not st.session_state.get('logged_in', False):
+if not st.session_state.get('doc_logged_in', False):
     st.warning("You must log in first to access the Doctor's page.")
-    st.switch_page("/Users/sanimpandey/Desktop/lang/pages/doc_login.py")  # Redirect to login page
+    st.switch_page("pages/doc_login.py")  # Redirect to login page
     st.experimental_rerun()  # Rerun the app to show the login page
 
 st.title(f"Welcome, {st.session_state.full_name}!")
 
 
 def get_patients(doctors_name, day=today):
-    print("doctor is "+doctors_name)
-    print("today is "+day)
     # Connect to MySQL
     connection = mysql.connector.connect(
-        host="localhost",
-        database='hospital',
-        user="root",
-        password=os.getenv('mysql_password')
+        host=os.getenv('Host'),
+        database=os.getenv('Database_name'),
+        user=os.getenv('Database_user'),
+        password=os.getenv('Database_password')
     )
-    print("sql connection made")
 
     patients_with_additional_details = []
 
@@ -49,7 +46,7 @@ def get_patients(doctors_name, day=today):
         print(patients)
 
         # Use `with` statement to manage MongoDB connection
-        with MongoClient('mongodb://localhost:27017/') as client:
+        with MongoClient(os.getenv('mongo_client')) as client:
             db = client['Hospital']
             collection = db['Patients']
 
@@ -102,11 +99,10 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 
 
 def main():
-    st.title("Doctor's agent")
-    patients_info  = get_patients(st.session_state.full_name,"Monday")
+    patients_info  = get_patients(st.session_state.full_name,'Thursday')
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
+    if "messages_doc" not in st.session_state:
+        st.session_state.messages_doc = [
                 {"role": "system", "content": """You are an assistant for a doctor at a hospital. Your job is to help the doctor by providing information about the patients they will examine today. Here’s how you should respond:
 
         1. **If the doctor asks who they are examining today,** provide a list of patients in this format: 
@@ -131,7 +127,7 @@ def main():
 
 
      #displaying messages
-    for message in st.session_state.messages:
+    for message in st.session_state.messages_doc:
         if message["role"] != "system":
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
@@ -141,19 +137,19 @@ def main():
         with st.chat_message("user"):
             st.markdown(question)
 
-        st.session_state.messages.append({"role": "user", "content": question})
+        st.session_state.messages_doc.append({"role": "user", "content": question})
 
         with st.chat_message("assistant"):
             # Generate a response from the assistant
             generated = client.chat.completions.create(
                 model="llama-3.1-70b-versatile",
                 messages=[
-                    {"role": m["role"], "content": m["content"]} for m in st.session_state.messages
+                    {"role": m["role"], "content": m["content"]} for m in st.session_state.messages_doc
                 ],
                 stream=False,
             )
             response_content = generated.choices[0].message.content
-            st.session_state.messages.append({"role":"assistant","content":response_content})
+            st.session_state.messages_doc.append({"role":"assistant","content":response_content})
             display_in_chunks_with_cursor(response_content)
 
 
