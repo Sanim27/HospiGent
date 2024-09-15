@@ -23,7 +23,7 @@ st.title(f"Welcome, {st.session_state.username}!")
 
 # Function to find information by patient name
 def find_information(patient_name):
-    client = MongoClient('mongodb://localhost:27017/')
+    client = MongoClient(os.getenv('mongo_client'))
     db = client['Hospital']
     collection = db['Patients']
     patient_info = collection.find_one({"name": patient_name})
@@ -51,7 +51,7 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 
 # Function to store patient information in MongoDB
 def information_store(patient_info, user, pw):
-    client = MongoClient('mongodb://localhost:27017/')
+    client = MongoClient(os.getenv('mongo_client'))
     db = client['Hospital']
     collection = db['Patients']
 
