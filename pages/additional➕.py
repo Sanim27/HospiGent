@@ -10,27 +10,48 @@ from io import BytesIO
 import google.generativeai as genai
 import random
 from pymongo import MongoClient
+import time
 
 dotenv.load_dotenv()
 # Check if user is logged in
-if not st.session_state.get('logged_in', False):
+if not st.session_state.get('pat_logged_in', False):
     st.text("PLEASE GO TO SIGNIN PAGE FIRST")
-    st.switch_page("/Users/sanimpandey/Desktop/lang/pages/signin✅_for_additional.py")  # Redirect back to login page if not logged in
+    st.switch_page("pages/signin✅_for_additional.py")  # Redirect back to login page if not logged in
 
 # Your additional page content goes here
-# st.title(f"Welcome, {st.session_state.username}!")
+st.title(f"Welcome, {st.session_state.username}!")
 
 # Function to find information by patient name
 def find_information(patient_name):
-    client = MongoClient(os.getenv('mongo_client'))
+    client = MongoClient('mongodb://localhost:27017/')
     db = client['Hospital']
     collection = db['Patients']
     patient_info = collection.find_one({"name": patient_name})
     print(patient_info)
 
+def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
+    message_placeholder = st.empty()
+    
+    # Initialize an empty string to accumulate the text
+    accumulated_text = ""
+    
+    # Iterate over the text in chunks
+    for i in range(0, len(response), chunk_size):
+        # Get the current chunk
+        chunk = response[i:i+chunk_size]
+        # Append the chunk to the accumulated text
+        accumulated_text += chunk
+        # Update the placeholder with the accumulated text and the cursor "▌"
+        message_placeholder.markdown(accumulated_text + "▌", unsafe_allow_html=True)
+        # Wait for 'delay' seconds before displaying the next chunk
+        time.sleep(delay)
+    
+    # After all chunks are displayed, remove the cursor
+    message_placeholder.markdown(accumulated_text, unsafe_allow_html=True)
+
 # Function to store patient information in MongoDB
 def information_store(patient_info, user, pw):
-    client = MongoClient(os.getenv('mongo_client'))
+    client = MongoClient('mongodb://localhost:27017/')
     db = client['Hospital']
     collection = db['Patients']
 
@@ -99,10 +120,9 @@ def stream_llm_response():
             "temperature": 0.3,
         }
     )
-    gemini_messages = messages_to_gemini(st.session_state.messages)
+    gemini_messages = messages_to_gemini(st.session_state.messages_additional_page)
     response = model.generate_content(contents=gemini_messages, stream=False)
     response = response.text
-    print(response)
     
     # Attempt to extract JSON-like part of the response
     json_match = re.search(r'\{.*\}', response, re.DOTALL)
@@ -113,14 +133,15 @@ def stream_llm_response():
         # Check if the conversation is complete
         chat_complete = response_dict.get('chat_complete', '').lower()  # Lowercase comparison
         if chat_complete == 'yes':
-            print("Chat completed, triggering information_store") # For debugging
+            # st.markdown(response_message)
+            display_in_chunks_with_cursor(response_message)
             information_store(response_dict['information_to_store'], st.session_state.username, st.session_state.password)
-            print("Information stored as chat_complete is 'yes'")
         else:
-            st.markdown(response_message)
+            # st.markdown(response_message)
+            display_in_chunks_with_cursor(response_message)
         
         # Append assistant message regardless of chat_complete status
-        st.session_state.messages.append({
+        st.session_state.messages_additional_page.append({
             "role": "assistant",
             "content": [
                 {
@@ -130,7 +151,7 @@ def stream_llm_response():
             ]
         })
     else:
-        st.markdown("No valid response received from the model.")
+        st.markdown(response)
 
 
 
@@ -148,14 +169,13 @@ def base64_to_image(base64_string):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Additional Information")
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
+    if "messages_additional_page" not in st.session_state:
+        st.session_state.messages_additional_page = [
             {
                 "role": "system",
                 "content": """
-                You are a chatbot for a hospital. Your main tasks are:
+                You are a chatbot for a hospital and you must work with sensitive information. It is completely okay to deal with patient medical reports as they are vital for better treatment. Your main tasks are:
                 
                 1. **Extract Information**:
                 - If they upload their medical report then you must compulsorily respond them. Asking if they have other additional information they want to share via chat or uploading image in sidebar.
@@ -183,12 +203,12 @@ def main():
                 **Conversation Continuation**:
                 - After each response, ask if the patient has additional information.
                 - If they indicate they have no further details to share with you , set `"chat_complete": "Yes"` immediately. Donot ask further questions. Wish them something good like good day. Otherwise, if they have further information to share then keep it as `"chat_complete": "No"`. 
-                - Since you are a good chatbot, it is your duty to always reply to the user
+                - Since you are a good chatbot, it is your duty to always reply to the user even at the end of conversation.
                 """
             }
         ]
     # Display previous messages if there are any
-    for message in st.session_state.messages:
+    for message in st.session_state.messages_additional_page:
         if message["role"] != "system":
             with st.chat_message(message["role"]):
                 for content in message["content"]:
@@ -207,7 +227,7 @@ def main():
 
     with st.sidebar:
         def reset_conversation():
-            if "messages" in st.session_state and len(st.session_state.messages) > 0:
+            if "messages" in st.session_state and len(st.session_state.messages_additional_page) > 0:
                 st.session_state.pop("messages", None)
 
         st.button("🗑️ Reset conversation", on_click=reset_conversation)
@@ -223,7 +243,7 @@ def main():
                 img = get_image_base64(raw_img)
                 
                 # Add image to session messages
-                st.session_state.messages.append({
+                st.session_state.messages_additional_page.append({
                     "role": "user",
                     "content": [{
                         "type": "image_url",
@@ -231,10 +251,8 @@ def main():
                     }]
                 })
                 
-                # Immediately trigger the LLM response after the image is added
-                with st.chat_message("assistant"):
-                    stream_llm_response()
-
+                # Set a flag to indicate that an image was just added
+                st.session_state.image_just_added = True
 
         cols_img = st.columns(2)
 
@@ -275,7 +293,7 @@ def main():
             with open(f"audio_{audio_id}.wav", "wb") as f:
                 f.write(speech_input)
 
-            st.session_state.messages.append({
+            st.session_state.messages_additional_page.append({
                 "role": "user",
                 "content": [{
                     "type": "audio_file",
@@ -288,7 +306,7 @@ def main():
     # Chat input
     if prompt := st.chat_input("Hi! Ask me anything...") or audio_prompt or audio_file_added:
         if not audio_file_added:
-            st.session_state.messages.append({
+            st.session_state.messages_additional_page.append({
                 "role": "user",
                 "content": [{
                     "type": "text",
@@ -307,6 +325,11 @@ def main():
         with st.chat_message("assistant"):
             stream_llm_response()
 
+    # Check if an image was just added and trigger LLM response
+    if st.session_state.get('image_just_added', False):
+        with st.chat_message("assistant"):
+            stream_llm_response()
+        st.session_state.image_just_added = False
+
 if __name__ == '__main__':
     main()
-
