@@ -228,8 +228,6 @@ def get_info_client(query):
 
 def main():
 
-    client = Groq(os.getenv('GROQ_API_KEY'))
-
     if "messages_admin" not in st.session_state:
         st.session_state.messages_admin = [
             {"role":"system","content":"""You are an assistant for hospital administrative staff. You need to make a conversation with the admin staff and perform certain tasks for him/her.
