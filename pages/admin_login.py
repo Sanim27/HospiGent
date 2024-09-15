@@ -48,7 +48,7 @@ if st.button("Login as Admin"):
         st.success("Login successful!")
         
         # Redirect to the admin page
-        st.switch_page("/Users/sanimpandey/Desktop/lang/pages/admin🧑‍💼.py")
+        st.switch_page("pages/admin🧑‍💼.py")
         st.experimental_rerun()
     else:
         st.error("Login failed. Please check your Admin ID or Full Name.")
