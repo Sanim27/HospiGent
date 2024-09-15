@@ -9,7 +9,7 @@ import os
 from pymongo import MongoClient
 dotenv.load_dotenv()
 
-client = Groq()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 todate = date.today()
 today = todate.strftime("%A")
 
