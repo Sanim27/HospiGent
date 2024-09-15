@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 dotenv.load_dotenv()
 
-client = Groq()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 if not st.session_state.get('admin_logged_in', False):
     st.warning("You must log in first to access the Admin page.")
