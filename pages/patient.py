@@ -20,7 +20,7 @@ import textwrap
 load_dotenv()
 
 # client = openai.OpenAI(api_key=api_key, base_url=AI71_BASE_URL)
-client = Groq(api_key=os.get_environ("GROQ_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 st.title("MediSched")
 def generate_unique_password(length=8):
