@@ -99,7 +99,7 @@ def display_in_chunks_with_cursor(response, chunk_size=10, delay=0.05):
 
 
 def main():
-    patients_info  = get_patients(st.session_state.full_name,"Wednesday")
+    patients_info  = get_patients(st.session_state.full_name)
 
     if "messages_doc" not in st.session_state:
         st.session_state.messages_doc = [
