@@ -9,6 +9,7 @@ git clone <repository-url>
 cd <repository-directory>
 
 pip install -r requirements.txt
+### connect to local mysql server.
 python3 database.py
 streamlit run Welcome.py
 
